@@ -66,6 +66,25 @@ npm run build
 
 ---
 
+## Deploy to Cloudflare Pages
+
+This repository is pre-configured for one-click deployment on **Cloudflare Pages**:
+
+1. Log into your [Cloudflare Dashboard](https://dash.cloudflare.com/).
+2. Navigate to **Workers & Pages** > **Create application** > **Pages** > **Connect to Git**.
+3. Select your repository: `nickadesa/sealbound`.
+4. Configure the build settings:
+   - **Framework preset:** `Vite`
+   - **Build command:** `npm run build`
+   - **Build output directory:** `dist`
+   - **Root directory:** `/`
+   - **Environment variables (Optional):** `NODE_VERSION` = `22` (or let it auto-detect from `.nvmrc`)
+5. Click **Save and Deploy**.
+6. (Optional) In your project settings on Cloudflare Pages, go to **Custom domains** to link your domain with free Cloudflare SSL/TLS and DDoS protection.
+
+---
+
 ## License
 
 ISC
+
