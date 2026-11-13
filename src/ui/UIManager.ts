@@ -58,28 +58,35 @@ export class UIManager {
         </div>
 
         <!-- Gold & Mode Badges -->
+        <!-- Gold, Shop & Fullscreen Tools -->
         <div class="top-right-tools">
           <div class="gold-pill">
             <span class="icon-wrap">${Icons.coin}</span>
             <span id="ui-gold-amount">800 G</span>
           </div>
 
+          <button id="btn-fullscreen-toggle" class="tool-pill-btn fullscreen-btn" aria-label="Toggle Fullscreen">
+            <span class="icon-wrap" id="icon-fullscreen">${Icons.fullscreen}</span>
+            <span class="btn-text">FULLSCREEN</span>
+          </button>
+
           <button id="btn-shop-toggle" class="tool-pill-btn">
             <span class="icon-wrap">${Icons.box}</span>
-            <span>SHOP</span>
+            <span class="btn-text">SHOP</span>
           </button>
 
-          <button id="btn-editor-toggle" class="tool-pill-btn">
+          <button id="btn-editor-toggle" class="tool-pill-btn desktop-only-tool">
             <span class="icon-wrap">${Icons.hammer}</span>
-            <span>EDITOR (F2)</span>
+            <span class="btn-text">EDITOR (F2)</span>
           </button>
 
-          <button id="btn-hitbox-toggle" class="tool-pill-btn">
+          <button id="btn-hitbox-toggle" class="tool-pill-btn desktop-only-tool">
             <span class="icon-wrap">${Icons.eye}</span>
-            <span>HITBOX (F3)</span>
+            <span class="btn-text">HITBOX (F3)</span>
           </button>
         </div>
       </header>
+
 
       <!-- RETICLE / TACTICAL CROSSHAIR -->
       <div class="tactical-crosshair" id="tactical-reticle">
@@ -190,17 +197,24 @@ export class UIManager {
 
         <!-- Mobile Skill Buttons -->
         <div class="touch-skills-cluster">
-          <button id="btn-touch-skill1" class="touch-skill-btn">
+          <button id="btn-touch-skill1" class="touch-skill-btn" aria-label="Skill 1">
             <span class="icon-wrap">${Icons.cleave}</span>
           </button>
-          <button id="btn-touch-skill2" class="touch-skill-btn">
+          <button id="btn-touch-skill2" class="touch-skill-btn" aria-label="Skill 2">
             <span class="icon-wrap">${Icons.aegis}</span>
           </button>
-          <button id="btn-touch-ult" class="touch-skill-btn touch-ult-btn">
+          <button id="btn-touch-ult" class="touch-skill-btn touch-ult-btn" aria-label="Ultimate">
             <span class="icon-wrap">${Icons.cataclysm}</span>
           </button>
         </div>
+
+        <!-- Mobile Hold-to-Plant/Defuse Button (Activates dynamically inside Site A/B) -->
+        <button id="btn-touch-plant" class="touch-btn plant-touch-btn" aria-label="Hold to Plant or Dispel">
+          <span class="icon-wrap pulse-icon">${Icons.seal}</span>
+          <span class="touch-label" id="touch-plant-label">HOLD SEAL</span>
+        </button>
       </div>
+
 
       <!-- BUY PHASE / PERKS SHOP MODAL (Fortnite / Apple Style) -->
       <div class="shop-modal-overlay" id="ui-shop-modal">
@@ -303,40 +317,86 @@ export class UIManager {
       this.onTouchSwap?.();
     });
 
-    // Touch controls
-    const attackBtn = document.getElementById('btn-touch-attack');
-    attackBtn?.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      this.onTouchAttack?.();
+    // Fullscreen Toggle
+    const fsBtn = document.getElementById('btn-fullscreen-toggle');
+    fsBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.toggleFullscreen();
     });
 
-    const swapBtn = document.getElementById('btn-touch-swap');
-    swapBtn?.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      this.onTouchSwap?.();
-    });
+    const updateFsIcon = () => {
+      const isFs = !!(document.fullscreenElement || (document as any).webkitFullscreenElement);
+      const iconWrap = document.getElementById('icon-fullscreen');
+      if (iconWrap) {
+        iconWrap.innerHTML = isFs ? Icons.exitFullscreen : Icons.fullscreen;
+      }
+    };
+    document.addEventListener('fullscreenchange', updateFsIcon);
+    document.addEventListener('webkitfullscreenchange', updateFsIcon);
 
-    const parryBtn = document.getElementById('btn-touch-parry');
-    parryBtn?.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      this.onTouchParry?.();
-    });
+    // Mobile Touch Action Buttons with stopPropagation & zero delay
+    const bindTouchAction = (id: string, cb?: () => void) => {
+      const btn = document.getElementById(id);
+      if (!btn) return;
+      btn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        cb?.();
+      }, { passive: false });
+    };
 
-    document.getElementById('btn-touch-skill1')?.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      this.onTouchSkill1?.();
-    });
+    bindTouchAction('btn-touch-attack', () => this.onTouchAttack?.());
+    bindTouchAction('btn-touch-swap', () => this.onTouchSwap?.());
+    bindTouchAction('btn-touch-parry', () => this.onTouchParry?.());
+    bindTouchAction('btn-touch-skill1', () => this.onTouchSkill1?.());
+    bindTouchAction('btn-touch-skill2', () => this.onTouchSkill2?.());
+    bindTouchAction('btn-touch-ult', () => this.onTouchUlt?.());
 
-    document.getElementById('btn-touch-skill2')?.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      this.onTouchSkill2?.();
-    });
+    // Mobile Plant/Defuse Hold button
+    const plantBtn = document.getElementById('btn-touch-plant');
+    if (plantBtn) {
+      plantBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.onTouchPlantHold?.(true);
+      }, { passive: false });
 
-    document.getElementById('btn-touch-ult')?.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      this.onTouchUlt?.();
-    });
+      const stopPlant = (e: TouchEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.onTouchPlantHold?.(false);
+      };
+      plantBtn.addEventListener('touchend', stopPlant);
+      plantBtn.addEventListener('touchcancel', stopPlant);
+    }
   }
+
+  public toggleFullscreen() {
+    const doc = document as any;
+    const docEl = document.documentElement as any;
+
+    try {
+      if (!doc.fullscreenElement && !doc.webkitFullscreenElement) {
+        if (docEl.requestFullscreen) {
+          docEl.requestFullscreen().catch(() => {});
+        } else if (docEl.webkitRequestFullscreen) {
+          docEl.webkitRequestFullscreen();
+        }
+        if (screen.orientation && (screen.orientation as any).lock) {
+          (screen.orientation as any).lock('landscape').catch(() => {});
+        }
+      } else {
+        if (doc.exitFullscreen) {
+          doc.exitFullscreen().catch(() => {});
+        } else if (doc.webkitExitFullscreen) {
+          doc.webkitExitFullscreen();
+        }
+      }
+    } catch (err) {
+      console.warn('Fullscreen toggle failed:', err);
+    }
+  }
+
 
   public toggleShop(forceState?: boolean) {
     this.isShopOpen = forceState !== undefined ? forceState : !this.isShopOpen;
@@ -405,21 +465,30 @@ export class UIManager {
     const objText = document.getElementById('ui-objective-subtext');
 
     if (objCard && objBar && objText) {
+      const touchPlantBtn = document.getElementById('btn-touch-plant');
+      const touchPlantLabel = document.getElementById('touch-plant-label');
+
       if (objective.isPlayerInsideSite) {
         objCard.classList.add('visible');
+        if (touchPlantBtn) touchPlantBtn.classList.add('visible');
+
         if (!objective.isPlanted) {
           objText.textContent = `HOLD [E] TO PLANT SEAL (${objective.activeSiteId})`;
+          if (touchPlantLabel) touchPlantLabel.textContent = `PLANT (${objective.activeSiteId})`;
           objBar.style.width = `${objective.plantProgress * 100}%`;
           objBar.style.background = '#00f0ff';
         } else if (!objective.isDefused && objective.activeSiteId === objective.plantedSiteId) {
           objText.textContent = `HOLD [E] TO DISPEL SEAL (${objective.activeSiteId})`;
+          if (touchPlantLabel) touchPlantLabel.textContent = `DISPEL (${objective.activeSiteId})`;
           objBar.style.width = `${objective.defuseProgress * 100}%`;
           objBar.style.background = '#ffaa00';
         }
       } else {
         objCard.classList.remove('visible');
+        if (touchPlantBtn) touchPlantBtn.classList.remove('visible');
       }
     }
+
 
     // Detonation Banner
     const banner = document.getElementById('ui-detonation-banner');

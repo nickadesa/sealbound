@@ -49,6 +49,7 @@ export class Engine {
 
     // 4. Core Systems
     this.cameraRig = new CameraRig();
+    this.ui = new UIManager();
     this.input = new InputManager(this.renderer.domElement);
     this.character = new Character();
     this.scene.add(this.character.mesh);
@@ -66,7 +67,7 @@ export class Engine {
     this.economy = new RoundEconomy();
     this.editor = new LevelEditor(this.scene);
     this.hitboxVisualizer = new HitboxVisualizer(this.scene);
-    this.ui = new UIManager();
+
 
     // Build default map geometry
     this.buildMapGeometry();
@@ -191,6 +192,11 @@ export class Engine {
       this.character.triggerAttack();
       this.combat.spawnFloatingDamage("CATACLYSM!", true, this.character.mesh.position.clone().add(new THREE.Vector3(0, 2, 0)));
     };
+
+    this.ui.onTouchPlantHold = (isHolding: boolean) => {
+      this.input.state.interact = isHolding;
+    };
+
 
     // Level Editor Prop placement buttons
     document.getElementById('btn-add-pillar')?.addEventListener('click', () => {

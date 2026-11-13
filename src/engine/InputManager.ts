@@ -117,31 +117,35 @@ export class InputManager {
   }
 
   private setupTouch() {
-    const touchArea = document.getElementById('touch-controls-layer');
-    if (!touchArea) return;
-
-    touchArea.addEventListener('touchstart', (e) => {
+    window.addEventListener('touchstart', (e) => {
       for (let i = 0; i < e.changedTouches.length; i++) {
         const touch = e.changedTouches[i];
-        // Left half of screen -> Joystick
-        if (touch.clientX < window.innerWidth / 2 && this.joystickTouchId === null) {
+        const target = touch.target as HTMLElement | null;
+
+        // Ignore touches that began on interactive UI elements (buttons, shop modal, toolbar)
+        if (target && target.closest('button, .tool-pill-btn, .touch-btn, .shop-modal-content, .editor-toolbar, input')) {
+          continue;
+        }
+
+        // Left half of screen -> Virtual Joystick
+        if (touch.clientX < window.innerWidth * 0.48 && this.joystickTouchId === null) {
           this.joystickTouchId = touch.identifier;
           this.joystickOrigin = { x: touch.clientX, y: touch.clientY };
           this.updateJoystickUI(touch.clientX, touch.clientY, 0, 0, true);
         }
-        // Right half of screen -> Aim look swipe
-        else if (touch.clientX >= window.innerWidth / 2 && this.aimTouchId === null) {
+        // Right half of screen -> TPP Aim Look Swipe
+        else if (touch.clientX >= window.innerWidth * 0.48 && this.aimTouchId === null) {
           this.aimTouchId = touch.identifier;
           this.lastAimPos = { x: touch.clientX, y: touch.clientY };
         }
       }
     }, { passive: false });
 
-    touchArea.addEventListener('touchmove', (e) => {
-      e.preventDefault();
+    window.addEventListener('touchmove', (e) => {
       for (let i = 0; i < e.changedTouches.length; i++) {
         const touch = e.changedTouches[i];
         if (touch.identifier === this.joystickTouchId) {
+          e.preventDefault();
           const dx = touch.clientX - this.joystickOrigin.x;
           const dy = touch.clientY - this.joystickOrigin.y;
           const dist = Math.hypot(dx, dy);
@@ -150,13 +154,14 @@ export class InputManager {
           const angle = Math.atan2(dy, dx);
 
           this.state.moveX = (clampedDist / maxRadius) * Math.cos(angle);
-          this.state.moveZ = -(clampedDist / maxRadius) * Math.sin(angle); // Invert Y for forward/back
+          this.state.moveZ = -(clampedDist / maxRadius) * Math.sin(angle); // Invert Y
           this.updateJoystickUI(this.joystickOrigin.x, this.joystickOrigin.y, dx, dy, true);
         } else if (touch.identifier === this.aimTouchId) {
+          e.preventDefault();
           const dx = touch.clientX - this.lastAimPos.x;
           const dy = touch.clientY - this.lastAimPos.y;
-          this.state.pointerDeltaX += dx * 1.5;
-          this.state.pointerDeltaY += dy * 1.5;
+          this.state.pointerDeltaX += dx * 2.2;
+          this.state.pointerDeltaY += dy * 2.2;
           this.lastAimPos = { x: touch.clientX, y: touch.clientY };
         }
       }
@@ -176,8 +181,8 @@ export class InputManager {
       }
     };
 
-    touchArea.addEventListener('touchend', handleTouchEnd);
-    touchArea.addEventListener('touchcancel', handleTouchEnd);
+    window.addEventListener('touchend', handleTouchEnd);
+    window.addEventListener('touchcancel', handleTouchEnd);
   }
 
   private updateJoystickUI(ox: number, oy: number, dx: number, dy: number, active: boolean) {
@@ -205,8 +210,8 @@ export class InputManager {
   }
 
   public update() {
-    // If on PC, read WASD
-    if (!this.state.isMobile) {
+    // Read Keyboard WASD (if mobile joystick is not actively being dragged)
+    if (this.joystickTouchId === null) {
       let x = 0;
       let z = 0;
       if (this.keys['KeyW'] || this.keys['ArrowUp']) z += 1;
@@ -214,7 +219,6 @@ export class InputManager {
       if (this.keys['KeyA'] || this.keys['ArrowLeft']) x -= 1;
       if (this.keys['KeyD'] || this.keys['ArrowRight']) x += 1;
 
-      // Normalize diagonal movement
       const len = Math.hypot(x, z);
       if (len > 0) {
         this.state.moveX = x / len;
@@ -223,12 +227,15 @@ export class InputManager {
         this.state.moveX = 0;
         this.state.moveZ = 0;
       }
+    }
 
-      this.state.sprint = !!this.keys['ShiftLeft'] || !!this.keys['ShiftRight'];
-      this.state.jump = !!this.keys['Space'];
-      this.state.interact = !!this.keys['KeyE'];
+    this.state.sprint = !!this.keys['ShiftLeft'] || !!this.keys['ShiftRight'];
+    this.state.jump = !!this.keys['Space'];
+    if (this.keys['KeyE']) {
+      this.state.interact = true;
     }
   }
+
 
   public consumePointerDelta(): { x: number; y: number } {
     const delta = { x: this.state.pointerDeltaX, y: this.state.pointerDeltaY };
