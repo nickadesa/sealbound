@@ -1,0 +1,36 @@
+{
+  "name": "Sanctuary of Whispers",
+  "theme": "Sky Shrine",
+  "size": { "width": 80, "depth": 90 },
+  "sites": [
+    {
+      "id": "A",
+      "name": "Site A - Sky Pillar",
+      "position": { "x": -22, "y": 0, "z": -12 },
+      "radius": 5.5,
+      "color": "#00f0ff"
+    },
+    {
+      "id": "B",
+      "name": "Site B - Sun Altar",
+      "position": { "x": 22, "y": 0, "z": -12 },
+      "radius": 5.5,
+      "color": "#ffaa00"
+    }
+  ],
+  "spawns": {
+    "attacker": { "x": 0, "y": 0, "z": 30 },
+    "defender": { "x": 0, "y": 0, "z": -32 }
+  },
+  "props": [
+    { "type": "pillar", "position": { "x": -22, "y": 0, "z": -12 }, "scale": { "x": 1.2, "y": 4, "z": 1.2 } },
+    { "type": "pillar", "position": { "x": 22, "y": 0, "z": -12 }, "scale": { "x": 1.2, "y": 4, "z": 1.2 } },
+    { "type": "wall", "position": { "x": 0, "y": 1.5, "z": 0 }, "scale": { "x": 6, "y": 3, "z": 1 } },
+    { "type": "crate", "position": { "x": -8, "y": 1, "z": 8 }, "scale": { "x": 2, "y": 2, "z": 2 } },
+    { "type": "crate", "position": { "x": 8, "y": 1, "z": 8 }, "scale": { "x": 2, "y": 2, "z": 2 } },
+    { "type": "wall", "position": { "x": -15, "y": 1.5, "z": 12 }, "scale": { "x": 1, "y": 3, "z": 8 } },
+    { "type": "wall", "position": { "x": 15, "y": 1.5, "z": 12 }, "scale": { "x": 1, "y": 3, "z": 8 } },
+    { "type": "pillar", "position": { "x": -10, "y": 2, "z": -10 }, "scale": { "x": 1.4, "y": 4.5, "z": 1.4 } },
+    { "type": "pillar", "position": { "x": 10, "y": 2, "z": -10 }, "scale": { "x": 1.4, "y": 4.5, "z": 1.4 } }
+  ]
+}

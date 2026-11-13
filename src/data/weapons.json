@@ -1,0 +1,31 @@
+{
+  "crimson_vein_greatsword": {
+    "id": "crimson_vein_greatsword",
+    "name": "Crimson-Vein Steel Greatsword",
+    "type": "melee_primary",
+    "cost": 2200,
+    "damage": 95,
+    "headshotMultiplier": 1.75,
+    "swingDuration": 0.45,
+    "recoveryDuration": 0.35,
+    "cancelWindow": 0.22,
+    "range": 2.8,
+    "description": "Substantial double-edged straight gunmetal blade with glowing central crimson energy vein.",
+    "icon": "sword"
+  },
+  "crimson_parrying_dagger": {
+    "id": "crimson_parrying_dagger",
+    "name": "Crimson-Edge Parrying Dagger",
+    "type": "melee_secondary",
+    "cost": 0,
+    "damage": 35,
+    "headshotMultiplier": 1.5,
+    "swingDuration": 0.25,
+    "recoveryDuration": 0.2,
+    "cancelWindow": 0.12,
+    "parryWindow": 0.4,
+    "range": 1.6,
+    "description": "Sharp gothic double-edged parrying dagger for off-hand parry and fast counter-attacks.",
+    "icon": "dagger"
+  }
+}

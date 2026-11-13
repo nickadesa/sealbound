@@ -1,0 +1,42 @@
+[
+  {
+    "id": "rune_shield_1",
+    "name": "Rune Shield I",
+    "category": "Defense",
+    "cost": 400,
+    "description": "Gain +25 Energy Shield points.",
+    "icon": "shield"
+  },
+  {
+    "id": "swift_phantom",
+    "name": "Swift Phantom",
+    "category": "Mobility",
+    "cost": 500,
+    "description": "Move 12% faster and footsteps are 50% quieter.",
+    "icon": "spark"
+  },
+  {
+    "id": "seal_master",
+    "name": "Seal Master",
+    "category": "Objective",
+    "cost": 400,
+    "description": "Plant seal 1s faster and defuse seal 1s faster.",
+    "icon": "seal"
+  },
+  {
+    "id": "quickdraw",
+    "name": "Quickdraw",
+    "category": "Weapon",
+    "cost": 600,
+    "description": "Swap primary and secondary weapons 40% faster.",
+    "icon": "swap"
+  },
+  {
+    "id": "vampiric_touch",
+    "name": "Vampiric Touch",
+    "category": "Combat",
+    "cost": 800,
+    "description": "Eliminations instantly restore 30 HP.",
+    "icon": "sword"
+  }
+]

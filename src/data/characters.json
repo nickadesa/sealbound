@@ -1,0 +1,47 @@
+[
+  {
+    "id": "kairo",
+    "name": "Kairo",
+    "title": "The Silver Sovereign",
+    "role": "Vanguard",
+    "height": 185,
+    "weight": 82,
+    "stats": {
+      "maxHp": 100,
+      "maxShield": 50,
+      "moveSpeed": 5.4,
+      "sprintSpeed": 8.2,
+      "jumpForce": 7.5
+    },
+    "loadout": {
+      "primaryWeaponId": "crimson_vein_greatsword",
+      "secondaryWeaponId": "crimson_parrying_dagger"
+    },
+    "skills": {
+      "skill1": {
+        "id": "crimson_cleave",
+        "name": "Crimson Cleave",
+        "description": "Leap forward and smash downward with the greatsword, fracturing the earth and stunning enemies.",
+        "cooldown": 14,
+        "damage": 65,
+        "icon": "cleave"
+      },
+      "skill2": {
+        "id": "steel_aegis",
+        "name": "Steel Aegis",
+        "description": "Cross sword and dagger into an X-guard, projecting a geometric energy barrier that absorbs projectiles.",
+        "cooldown": 18,
+        "duration": 3.0,
+        "icon": "aegis"
+      },
+      "ultimate": {
+        "id": "tectonic_cataclysm",
+        "name": "Tectonic Cataclysm",
+        "description": "Plunge greatsword deep into earth, unleashing a 15-meter straight line of erupting steel blades.",
+        "pointsRequired": 8,
+        "damage": 150,
+        "icon": "cataclysm"
+      }
+    }
+  }
+]

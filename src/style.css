@@ -1,0 +1,958 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400..900;1,14..32,700..900&display=swap');
+
+:root {
+  --bg-dark: #0a0c0e;
+  --panel-glass: rgba(16, 20, 24, 0.72);
+  --panel-border: rgba(255, 255, 255, 0.12);
+  --accent-cyan: #00f0ff;
+  --accent-crimson: #ff1e38;
+  --accent-gold: #ffbe0b;
+  --text-primary: #ffffff;
+  --text-muted: #8e959e;
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+body, html {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-dark);
+  font-family: var(--font-family);
+  color: var(--text-primary);
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+}
+
+#canvas-container {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+#ui-root {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* =========================================================================
+   TOP NAV / MATCH STATUS (Apple / Fortnite Pill Bar)
+   ========================================================================= */
+.top-nav-bar {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  pointer-events: auto;
+  z-index: 20;
+}
+
+.team-score {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--panel-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--panel-border);
+  padding: 6px 16px;
+  border-radius: 9999px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+.team-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.defender-score .score-number {
+  color: var(--accent-cyan);
+  font-size: 1.25rem;
+  font-weight: 900;
+}
+
+.attacker-score .score-number {
+  color: var(--accent-crimson);
+  font-size: 1.25rem;
+  font-weight: 900;
+}
+
+.round-timer-pill {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--panel-glass);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 8px 22px;
+  border-radius: 9999px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+}
+
+.round-indicator {
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+}
+
+.timer-display {
+  font-size: 1.35rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+.site-status-badges {
+  display: flex;
+  gap: 6px;
+}
+
+.site-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 900;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-muted);
+}
+
+.site-badge.planted {
+  background: var(--accent-crimson);
+  color: #fff;
+  border-color: #ff5568;
+  animation: pulseBadge 1s infinite alternate;
+}
+
+@keyframes pulseBadge {
+  0% { transform: scale(1); box-shadow: 0 0 0 rgba(255, 30, 56, 0); }
+  100% { transform: scale(1.15); box-shadow: 0 0 14px rgba(255, 30, 56, 0.8); }
+}
+
+/* Top Right Tools */
+.top-right-tools {
+  position: absolute;
+  top: 16px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  pointer-events: auto;
+}
+
+.gold-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--panel-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--panel-border);
+  padding: 8px 16px;
+  border-radius: 9999px;
+  font-weight: 800;
+  font-size: 0.88rem;
+  color: var(--accent-gold);
+}
+
+.tool-pill-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--panel-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--panel-border);
+  padding: 8px 14px;
+  border-radius: 9999px;
+  color: #fff;
+  font-family: var(--font-family);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: transform 100ms ease, background 150ms ease;
+}
+
+.tool-pill-btn:active {
+  transform: scale(0.95);
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+}
+
+.icon-wrap svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* =========================================================================
+   TACTICAL CROSSHAIR
+   ========================================================================= */
+.tactical-crosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 28px;
+  height: 28px;
+  pointer-events: none;
+}
+
+.reticle-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 3px;
+  height: 3px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+}
+
+.reticle-line {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+}
+
+.reticle-top { top: 0; left: 50%; transform: translateX(-50%); width: 2px; height: 6px; }
+.reticle-bottom { bottom: 0; left: 50%; transform: translateX(-50%); width: 2px; height: 6px; }
+.reticle-left { top: 50%; left: 0; transform: translateY(-50%); width: 6px; height: 2px; }
+.reticle-right { top: 50%; right: 0; transform: translateY(-50%); width: 6px; height: 2px; }
+
+/* =========================================================================
+   OBJECTIVE PROMPT (HOLD TO PLANT/DEFUSE)
+   ========================================================================= */
+.objective-prompt-card {
+  position: absolute;
+  top: 65%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  background: var(--panel-glass);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 16px 28px;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease, transform 200ms ease;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+}
+
+.objective-prompt-card.visible {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.prompt-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #fff;
+}
+
+.progress-bar-track {
+  width: 220px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  width: 0%;
+  height: 100%;
+  background: var(--accent-cyan);
+  border-radius: 9999px;
+  transition: width 50ms linear;
+}
+
+.prompt-subtext {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+/* Detonation Banner */
+.detonation-banner {
+  position: absolute;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 30, 56, 0.2);
+  border: 1px solid var(--accent-crimson);
+  backdrop-filter: blur(16px);
+  padding: 8px 24px;
+  border-radius: 9999px;
+}
+
+.detonation-banner.visible {
+  display: flex;
+  animation: flashRed 1s infinite alternate;
+}
+
+@keyframes flashRed {
+  0% { opacity: 0.8; }
+  100% { opacity: 1; }
+}
+
+.detonation-text {
+  font-size: 0.85rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  color: #fff;
+}
+
+/* =========================================================================
+   BOTTOM HUD (HEALTH, WEAPON & SKILLS)
+   ========================================================================= */
+.bottom-tactical-hud {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+  pointer-events: auto;
+  z-index: 20;
+}
+
+/* Vitals */
+.vitals-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--panel-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--panel-border);
+  padding: 12px 18px;
+  border-radius: 20px;
+  min-width: 220px;
+}
+
+.vital-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vital-label {
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  width: 44px;
+}
+
+.bar-track {
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.hp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #30d158, #34c759);
+  border-radius: 9999px;
+  transition: width 150ms ease;
+}
+
+.shield-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00f0ff, #00a2ff);
+  border-radius: 9999px;
+  transition: width 150ms ease;
+}
+
+.vital-value {
+  font-size: 0.85rem;
+  font-weight: 800;
+  width: 28px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Skills Row */
+.skills-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.skill-circle-badge {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: var(--panel-glass);
+  backdrop-filter: blur(24px);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  transition: transform 100ms ease, border-color 150ms ease;
+}
+
+.skill-circle-badge:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.skill-icon-inner {
+  width: 26px;
+  height: 26px;
+  color: #fff;
+}
+
+.skill-hotkey {
+  position: absolute;
+  bottom: -6px;
+  background: #1b1e22;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 0.62rem;
+  font-weight: 900;
+  color: #fff;
+}
+
+.ultimate-badge {
+  border-color: rgba(255, 190, 11, 0.5);
+  box-shadow: 0 0 16px rgba(255, 190, 11, 0.3);
+}
+
+.ultimate-badge .skill-icon-inner {
+  color: var(--accent-gold);
+}
+
+/* Weapon Card */
+.weapon-card-panel {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--panel-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--panel-border);
+  padding: 12px 18px;
+  border-radius: 20px;
+}
+
+.weapon-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.weapon-slot-tag {
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  color: var(--accent-cyan);
+}
+
+.weapon-name {
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #fff;
+}
+
+.weapon-swap-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  transition: transform 100ms ease;
+}
+
+.weapon-swap-btn:active {
+  transform: scale(0.92);
+}
+
+.hotkey-hint {
+  font-size: 0.55rem;
+  font-weight: 900;
+  color: var(--text-muted);
+}
+
+/* =========================================================================
+   FLOATING DAMAGE NUMBERS
+   ========================================================================= */
+#floating-damage-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 15;
+}
+
+.floating-dmg {
+  position: absolute;
+  font-size: 1.4rem;
+  font-weight: 900;
+  transform: translate(-50%, -50%);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+}
+
+.floating-dmg.body {
+  color: #ffffff;
+}
+
+.floating-dmg.headshot {
+  color: #ff3b30;
+  font-size: 1.8rem;
+}
+
+/* =========================================================================
+   BUY PHASE / SHOP MODAL (Fortnite / Apple Style)
+   ========================================================================= */
+.shop-modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  pointer-events: auto;
+}
+
+.shop-modal-overlay.active {
+  display: flex;
+}
+
+.shop-modal-content {
+  width: 90%;
+  max-width: 880px;
+  background: #111418;
+  border: 1px solid var(--panel-border);
+  border-radius: 28px;
+  padding: 32px;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.8);
+}
+
+.shop-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.shop-tag {
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  color: var(--accent-cyan);
+}
+
+.shop-title {
+  font-size: 1.6rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.shop-wallet {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 190, 11, 0.1);
+  border: 1px solid rgba(255, 190, 11, 0.3);
+  padding: 8px 18px;
+  border-radius: 9999px;
+  color: var(--accent-gold);
+  font-weight: 900;
+}
+
+.shop-close-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: #fff;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.shop-sections-grid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 24px;
+}
+
+.shop-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--panel-border);
+  border-radius: 20px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card-badge {
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  color: var(--accent-crimson);
+  margin-bottom: 8px;
+}
+
+.card-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.card-desc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin-bottom: 16px;
+}
+
+.card-stats {
+  display: flex;
+  gap: 16px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--accent-cyan);
+  margin-bottom: 20px;
+}
+
+.card-price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.price-val {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: var(--accent-gold);
+}
+
+.pill-action-btn {
+  background: #ffffff;
+  color: #000;
+  font-family: var(--font-family);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: transform 100ms ease;
+}
+
+.pill-action-btn:active {
+  transform: scale(0.95);
+}
+
+.pill-action-btn:disabled {
+  background: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.4);
+  cursor: not-allowed;
+}
+
+.section-label {
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 12px;
+}
+
+.perks-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.perk-item-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.perk-category {
+  font-size: 0.58rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  color: var(--accent-cyan);
+}
+
+.perk-name {
+  font-size: 0.92rem;
+  font-weight: 800;
+  margin: 4px 0;
+}
+
+.perk-desc {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+.perk-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+.perk-cost {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--accent-gold);
+}
+
+/* =========================================================================
+   IN-BROWSER LEVEL EDITOR TOOLBAR (F2)
+   ========================================================================= */
+.editor-toolbar {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  align-items: center;
+  gap: 16px;
+  background: var(--panel-glass);
+  backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 12px 24px;
+  border-radius: 9999px;
+  pointer-events: auto;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+}
+
+.editor-toolbar.visible {
+  display: flex;
+}
+
+.editor-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  font-weight: 900;
+  color: var(--accent-cyan);
+}
+
+.editor-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.editor-pill-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--panel-border);
+  color: #fff;
+  font-family: var(--font-family);
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: transform 100ms ease;
+}
+
+.editor-pill-btn:active {
+  transform: scale(0.94);
+}
+
+.editor-pill-btn.export-btn {
+  background: var(--accent-cyan);
+  color: #000;
+  border: none;
+}
+
+/* =========================================================================
+   MOBILE TOUCH CONTROLS (VIRTUAL HUD LAYER)
+   ========================================================================= */
+.touch-hud-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: auto;
+  display: none;
+}
+
+@media (pointer: coarse) {
+  .touch-hud-layer {
+    display: block;
+  }
+}
+
+.joystick-base {
+  position: absolute;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(12px);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.joystick-knob {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 48px;
+  height: 48px;
+  margin-top: -24px;
+  margin-left: -24px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+
+/* Action Buttons Cluster (Right Thumb) */
+.touch-actions-cluster {
+  position: absolute;
+  bottom: 30px;
+  right: 28px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.touch-btn {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: var(--panel-glass);
+  backdrop-filter: blur(20px);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: transform 100ms ease;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.touch-btn:active {
+  transform: scale(0.92);
+}
+
+.touch-label {
+  font-size: 0.58rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+}
+
+.attack-touch-btn {
+  width: 76px;
+  height: 76px;
+  background: var(--accent-crimson);
+  border-color: #ff5568;
+}
+
+/* Touch Skills Cluster */
+.touch-skills-cluster {
+  position: absolute;
+  bottom: 120px;
+  right: 40px;
+  display: flex;
+  gap: 12px;
+}
+
+.touch-skill-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--panel-glass);
+  backdrop-filter: blur(20px);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.touch-ult-btn {
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+}
